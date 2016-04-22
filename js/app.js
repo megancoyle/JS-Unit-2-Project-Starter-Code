@@ -15,22 +15,18 @@ var $mainContent = $("#main");
 var source = $("#article-template").html();
 var template = Handlebars.compile(source);
 var $title = $(".article .articleContent h3");
+var $navItems = $("nav ul ul li");
 
-// On click of article title, display pop-up
-$title.click(function(e) {
-  e.preventDefault();
-  console.log("click");
-  $popUp.removeClass("loader hidden");
-})
-$closePopUp.click(function(e) {
-  e.preventDefault();
-  $popUp.addClass("loader hidden");
+$initialValue.hover(function() {
+  $navItems.show();
 })
 
 $redditValue.click(function() {
-  $mainContent.html("");
+  $navItems.hide();
   $initialValue.text("Reddit");
-  searchReddit();
+  $search.click(function() {
+    searchReddit();
+  })
 })
 
 // REDDIT API
@@ -42,6 +38,7 @@ $redditValue.click(function() {
 // data.children.data.score
 
 function searchReddit() {
+  $mainContent.empty();
   var url = 'https://www.reddit.com/top.json';
   $.get(url, function(response){
       var baseUrl = response.data.children
@@ -58,16 +55,18 @@ function searchReddit() {
           image: featureImage,
           link: contentUrl
         }
-        $("#main").append(template(article));
+        $mainContent.append(template(article));
       }
   })
 }
 
 
 $mashableValue.click(function() {
-  $mainContent.html("");
+  $navItems.hide();
   $initialValue.text("Mashable");
-  searchMashable();
+  $search.click(function() {
+    searchMashable();
+  })
 })
 
 // MASHABLE API
@@ -79,6 +78,7 @@ $mashableValue.click(function() {
 // new.shares.total
 
 function searchMashable() {
+  $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/mashable.json';
   $.get(url, function(response){
       var baseUrl = response.new
@@ -95,15 +95,17 @@ function searchMashable() {
           image: featureImage,
           link: contentUrl
         }
-        $("#main").append(template(article));
+        $mainContent.append(template(article));
       }
   })
 }
 
 $diggValue.click(function() {
-  $mainContent.html("");
+  $navItems.hide();
   $initialValue.text("Digg");
-  searchDigg();
+  $search.click(function() {
+    searchDigg();
+  })
 })
 
 // DIGG API
@@ -115,6 +117,7 @@ $diggValue.click(function() {
 // data.feed.diggs.count
 
 function searchDigg() {
+  $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/digg.json';
   $.get(url, function(response){
       var baseUrl = response.data.feed
@@ -132,7 +135,22 @@ function searchDigg() {
           image: featureImage,
           link: contentUrl
         }
-        $("#main").append(template(article));
+        $mainContent.append(template(article));
       }
+      // $title.click(function(e) {
+      //   e.preventDefault();
+      //   console.log("click");
+      // })
   })
 }
+
+// On click of article title, display pop-up
+$title.click(function(e) {
+  e.preventDefault();
+  console.log("click");
+  $popUp.removeClass("loader hidden");
+})
+$closePopUp.click(function(e) {
+  e.preventDefault();
+  $popUp.addClass("loader hidden");
+})
