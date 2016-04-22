@@ -16,6 +16,16 @@ var source = $("#article-template").html();
 var template = Handlebars.compile(source);
 var $title = $(".article .articleContent h3");
 
+// On click of article title, display pop-up
+$title.click(function(e) {
+  e.preventDefault();
+  console.log("click");
+  $popUp.removeClass("loader hidden");
+})
+$closePopUp.click(function(e) {
+  e.preventDefault();
+  $popUp.addClass("loader hidden");
+})
 
 $redditValue.click(function() {
   $mainContent.html("");
@@ -34,12 +44,13 @@ $redditValue.click(function() {
 function searchReddit() {
   var url = 'https://www.reddit.com/top.json';
   $.get(url, function(response){
-      for (i = 0; i < response.data.children.length; i++) {
-        var titleArticle = response.data.children[i].data.title;
-        var contentUrl = response.data.children[i].data.url;
-        var featureImage = response.data.children[i].data.thumbnail;
-        var category = response.data.children[i].data.subreddit;
-        var count = response.data.children[i].data.score;
+      var baseUrl = response.data.children
+      for (i = 0; i < baseUrl.length; i++) {
+        var titleArticle = baseUrl[i].data.title;
+        var contentUrl = baseUrl[i].data.url;
+        var featureImage = baseUrl[i].data.thumbnail;
+        var category = baseUrl[i].data.subreddit;
+        var count = baseUrl[i].data.score;
         var article = {
           title: titleArticle,
           impressions: count,
@@ -70,12 +81,13 @@ $mashableValue.click(function() {
 function searchMashable() {
   var url = 'http://feedr-api.wdidc.org/mashable.json';
   $.get(url, function(response){
-      for (i = 0; i < response.new.length; i++) {
-        var titleArticle = response.new[i].title;
-        var contentUrl = response.new[i].link;
-        var featureImage = response.new[i].responsive_images[0].image;
-        var category = response.new[i].channel;
-        var count = response.new[i].shares.total;
+      var baseUrl = response.new
+      for (i = 0; i < baseUrl.length; i++) {
+        var titleArticle = baseUrl[i].title;
+        var contentUrl = baseUrl[i].link;
+        var featureImage = baseUrl[i].responsive_images[0].image;
+        var category = baseUrl[i].channel;
+        var count = baseUrl[i].shares.total;
         var article = {
           title: titleArticle,
           impressions: count,
@@ -105,13 +117,14 @@ $diggValue.click(function() {
 function searchDigg() {
   var url = 'http://feedr-api.wdidc.org/digg.json';
   $.get(url, function(response){
+      var baseUrl = response.data.feed
     // console.log(response);
-      for (i = 0; i < response.data.feed.length; i++) {
-        var titleArticle = response.data.feed[i].content.title;
-        var contentUrl = response.data.feed[i].content.url;
-        var featureImage = response.data.feed[i].content.media.images[0].url;
-        var category = response.data.feed[i].content.domain_name;
-        var count = response.data.feed[i].diggs.count;
+      for (i = 0; i < baseUrl.length; i++) {
+        var titleArticle = baseUrl[i].content.title;
+        var contentUrl = baseUrl[i].content.url;
+        var featureImage = baseUrl[i].content.media.images[0].url;
+        var category = baseUrl[i].content.domain_name;
+        var count = baseUrl[i].diggs.count;
         var article = {
           title: titleArticle,
           impressions: count,
@@ -119,20 +132,7 @@ function searchDigg() {
           image: featureImage,
           link: contentUrl
         }
-        var source = $("#article-template").html();
-        var template = Handlebars.compile(source);
         $("#main").append(template(article));
       }
   })
 }
-
-// On click of article title, display pop-up
-$title.click(function(e) {
-  e.preventDefault();
-  console.log("click");
-  $popUp.removeClass("loader hidden");
-})
-$closePopUp.click(function(e) {
-  e.preventDefault();
-  $popUp.addClass("loader hidden");
-})
