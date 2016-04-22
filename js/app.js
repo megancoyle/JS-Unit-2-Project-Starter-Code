@@ -77,7 +77,7 @@ function searchMashable() {
       for (i = 0; i < response.new.length; i++) {
         var titleArticle = response.new[i].title;
         var contentUrl = response.new[i].link;
-        var featureImage = response.new[i].feature_image;
+        var featureImage = response.new[i].responsive_images[0].image;
         var category = response.new[i].channel;
         var count = response.new[i].shares.total;
         var article = {
