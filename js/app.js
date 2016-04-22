@@ -4,6 +4,7 @@
 
 var $article = $("article");
 var $popUp = $("#popUp");
+var $closePopUp = $(".closePopUp")
 var $search = $("#search");
 var $nav = $("nav");
 var $mashableValue = $("#mashable");
@@ -11,13 +12,10 @@ var $redditValue = $("#reddit");
 var $diggValue = $("#digg");
 var $initialValue = $("#initial-value span");
 var $mainContent = $("#main");
+var source = $("#article-template").html();
+var template = Handlebars.compile(source);
+var $title = $(".article .articleContent h3");
 
-
-
-// On mouseover of specific article, show popup
-// $article.mouseover(function() {
-//   $popUp.show();
-//      })
 
 $redditValue.click(function() {
   $mainContent.html("");
@@ -49,8 +47,6 @@ function searchReddit() {
           image: featureImage,
           link: contentUrl
         }
-        var source = $("#article-template").html();
-        var template = Handlebars.compile(source);
         $("#main").append(template(article));
       }
   })
@@ -87,8 +83,6 @@ function searchMashable() {
           image: featureImage,
           link: contentUrl
         }
-        var source = $("#article-template").html();
-        var template = Handlebars.compile(source);
         $("#main").append(template(article));
       }
   })
@@ -131,3 +125,14 @@ function searchDigg() {
       }
   })
 }
+
+// On click of article title, display pop-up
+$title.click(function(e) {
+  e.preventDefault();
+  console.log("click");
+  $popUp.removeClass("loader hidden");
+})
+$closePopUp.click(function(e) {
+  e.preventDefault();
+  $popUp.addClass("loader hidden");
+})
