@@ -3,8 +3,10 @@
 */
 
 var $article = $("article");
+var $dropdownButton = $(".dropdown-button");
+var $dropdownMenu = $(".dropdown-menu");
 var $popUp = $("#popUp");
-var $closePopUp = $(".closePopUp")
+var $closePopUp = $(".closePopUp");
 var $search = $("#search");
 var $nav = $("nav");
 var $mashableValue = $("#mashable");
@@ -12,22 +14,43 @@ var $redditValue = $("#reddit");
 var $diggValue = $("#digg");
 var $initialValue = $("#initial-value span");
 var $mainContent = $("#main");
+var $navItems = $("nav ul ul li");
+//Handlebars Template variables
 var source = $("#article-template").html();
 var template = Handlebars.compile(source);
-var $title = $(".article .articleContent h3");
-var $navItems = $("nav ul ul li");
 
-$initialValue.hover(function() {
-  $navItems.show();
+$dropdownButton.hover(function () {
+  $dropdownMenu.addClass("open");
+});
+
+$search.click(function(){
+  switch ($initialValue.text()) {
+    case 'Reddit':
+      searchReddit();
+      break;
+    case 'Digg':
+      searchDigg();
+      break;
+    case 'Mashable':
+      searchMashable();
+      break;
+  }
 })
+
+function Article(options) {
+  this.title = options.title;
+  this.impressions = options.impressions;
+  this.tag = options.tag;
+  this.image = options.image;
+  this.link = options.link;
+}
 
 $redditValue.click(function() {
-  $navItems.hide();
+  $dropdownMenu.removeClass("open");
   $initialValue.text("Reddit");
-  $search.click(function() {
-    searchReddit();
-  })
 })
+
+// console.log(myArticle);
 
 // REDDIT API
 // data.children.data.title
@@ -41,20 +64,17 @@ function searchReddit() {
   $mainContent.empty();
   var url = 'https://www.reddit.com/top.json';
   $.get(url, function(response){
-      var baseUrl = response.data.children
-      for (i = 0; i < baseUrl.length; i++) {
-        var titleArticle = baseUrl[i].data.title;
-        var contentUrl = baseUrl[i].data.url;
-        var featureImage = baseUrl[i].data.thumbnail;
-        var category = baseUrl[i].data.subreddit;
-        var count = baseUrl[i].data.score;
-        var article = {
-          title: titleArticle,
-          impressions: count,
-          tag: category,
-          image: featureImage,
-          link: contentUrl
-        }
+      var articleData = response.data.children
+      for (i = 0; i < articleData.length; i++) {
+        var article = new Article({
+          title: articleData[i].data.title,
+          impressions: articleData[i].data.score,
+          tag: articleData[i].data.subreddit,
+          image: articleData[i].data.thumbnail,
+          link: articleData[i].data.url
+        });
+
+        console.log(article);
         $mainContent.append(template(article));
       }
   })
@@ -62,11 +82,8 @@ function searchReddit() {
 
 
 $mashableValue.click(function() {
-  $navItems.hide();
+  $dropdownMenu.removeClass("open");
   $initialValue.text("Mashable");
-  $search.click(function() {
-    searchMashable();
-  })
 })
 
 // MASHABLE API
@@ -81,31 +98,23 @@ function searchMashable() {
   $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/mashable.json';
   $.get(url, function(response){
-      var baseUrl = response.new
-      for (i = 0; i < baseUrl.length; i++) {
-        var titleArticle = baseUrl[i].title;
-        var contentUrl = baseUrl[i].link;
-        var featureImage = baseUrl[i].responsive_images[0].image;
-        var category = baseUrl[i].channel;
-        var count = baseUrl[i].shares.total;
-        var article = {
-          title: titleArticle,
-          impressions: count,
-          tag: category,
-          image: featureImage,
-          link: contentUrl
-        }
+      var articleData = response.new;
+      for (i = 0; i < articleData.length; i++) {
+        var article = new Article({
+          title: articleData[i].title,
+          impressions: articleData[i].shares.total,
+          tag: articleData[i].channel,
+          image: articleData[i].responsive_images[0].image,
+          link: articleData[i].link
+        });
         $mainContent.append(template(article));
       }
   })
 }
 
 $diggValue.click(function() {
-  $navItems.hide();
+  $dropdownMenu.removeClass("open");
   $initialValue.text("Digg");
-  $search.click(function() {
-    searchDigg();
-  })
 })
 
 // DIGG API
@@ -120,23 +129,25 @@ function searchDigg() {
   $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/digg.json';
   $.get(url, function(response){
-      var baseUrl = response.data.feed
+      var articleData = response.data.feed;
     // console.log(response);
-      for (i = 0; i < baseUrl.length; i++) {
-        var titleArticle = baseUrl[i].content.title;
-        var contentUrl = baseUrl[i].content.url;
-        var featureImage = baseUrl[i].content.media.images[0].url;
-        var category = baseUrl[i].content.domain_name;
-        var count = baseUrl[i].diggs.count;
-        var article = {
-          title: titleArticle,
-          impressions: count,
-          tag: category,
-          image: featureImage,
-          link: contentUrl
-        }
+      for (i = 0; i < articleData.length; i++) {
+        var article = new Article({
+          title: articleData[i].content.title,
+          impressions: articleData[i].diggs.count,
+          tag: articleData[i].content.domain_name,
+          image: articleData[i].content.media.images[0].url,
+          link: articleData[i].content.url
+        });
         $mainContent.append(template(article));
+        // console.log('appended article', $title);
       }
+
+      var $title = $(".article .articleContent h3");
+      $title.click(function (e) {
+        console.log('title clicked', $title);
+      })
+
       // $title.click(function(e) {
       //   e.preventDefault();
       //   console.log("click");
@@ -145,11 +156,11 @@ function searchDigg() {
 }
 
 // On click of article title, display pop-up
-$title.click(function(e) {
-  e.preventDefault();
-  console.log("click");
-  $popUp.removeClass("loader hidden");
-})
+// $title.click(function(e) {
+//   e.preventDefault();
+//   console.log("click");
+//   $popUp.removeClass("loader hidden");
+// })
 $closePopUp.click(function(e) {
   e.preventDefault();
   $popUp.addClass("loader hidden");
