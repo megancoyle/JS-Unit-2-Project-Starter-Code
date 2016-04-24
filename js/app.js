@@ -43,6 +43,7 @@ function Article(options) {
   this.tag = options.tag;
   this.image = options.image;
   this.link = options.link;
+  this.description = options.description;
 }
 
 $redditValue.click(function() {
@@ -71,12 +72,28 @@ function searchReddit() {
           impressions: articleData[i].data.score,
           tag: articleData[i].data.subreddit,
           image: articleData[i].data.thumbnail,
-          link: articleData[i].data.url
+          link: articleData[i].data.url,
+          description: " "
         });
-
-        console.log(article);
         $mainContent.append(template(article));
+        var $popUpTitle = $("#popUp h1");
+        var $popUpContent = $("#popUp p");
+        var $popUpLink = $(".popUpAction");
       }
+      // On click of article title, display pop-up
+      var $title = $(".article .articleContent h3");
+      $title.click(function (e) {
+        e.preventDefault();
+        var $clickedTitle = $(e.target);
+        var $selectedArticle = $clickedTitle.closest('.article');
+        var titleText = $selectedArticle.find('.title').text();
+        var contentText = $selectedArticle.find('.content').text();
+        var storyLink = $selectedArticle.find('.story-link').attr("href");
+        $popUpTitle.html(titleText);
+        $popUpContent.html(contentText);
+        $popUpLink.attr("href", storyLink);
+        $popUp.removeClass("loader hidden");
+      })
   })
 }
 
@@ -105,10 +122,29 @@ function searchMashable() {
           impressions: articleData[i].shares.total,
           tag: articleData[i].channel,
           image: articleData[i].responsive_images[0].image,
-          link: articleData[i].link
+          link: articleData[i].link,
+          description: articleData[i].content.plain
         });
+        console.log(article);
         $mainContent.append(template(article));
+        var $popUpTitle = $("#popUp h1");
+        var $popUpContent = $("#popUp p");
+        var $popUpLink = $(".popUpAction");
       }
+      // On click of article title, display pop-up
+      var $title = $(".article .articleContent h3");
+      $title.click(function (e) {
+        e.preventDefault();
+        var $clickedTitle = $(e.target);
+        var $selectedArticle = $clickedTitle.closest('.article');
+        var titleText = $selectedArticle.find('.title').text();
+        var contentText = $selectedArticle.find('.content').text();
+        var storyLink = $selectedArticle.find('.story-link').attr("href");
+        $popUpTitle.html(titleText);
+        $popUpContent.html(contentText);
+        $popUpLink.attr("href", storyLink);
+        $popUp.removeClass("loader hidden");
+      })
   })
 }
 
@@ -137,30 +173,33 @@ function searchDigg() {
           impressions: articleData[i].diggs.count,
           tag: articleData[i].content.domain_name,
           image: articleData[i].content.media.images[0].url,
-          link: articleData[i].content.url
+          link: articleData[i].content.url,
+          description: articleData[i].content.description
         });
         $mainContent.append(template(article));
-        // console.log('appended article', $title);
+        var $popUpTitle = $("#popUp h1");
+        var $popUpContent = $("#popUp p");
+        var $popUpLink = $(".popUpAction");
       }
-
+      // On click of article title, display pop-up
       var $title = $(".article .articleContent h3");
       $title.click(function (e) {
-        console.log('title clicked', $title);
+        e.preventDefault();
+        var $clickedTitle = $(e.target);
+        var $selectedArticle = $clickedTitle.closest('.article');
+        var titleText = $selectedArticle.find('.title').text();
+        var contentText = $selectedArticle.find('.content').text();
+        var storyLink = $selectedArticle.find('.story-link').attr("href");
+        $popUpTitle.html(titleText);
+        $popUpContent.html(contentText);
+        $popUpLink.attr("href", storyLink);
+        $popUp.removeClass("loader hidden");
       })
 
-      // $title.click(function(e) {
-      //   e.preventDefault();
-      //   console.log("click");
-      // })
   })
 }
 
-// On click of article title, display pop-up
-// $title.click(function(e) {
-//   e.preventDefault();
-//   console.log("click");
-//   $popUp.removeClass("loader hidden");
-// })
+// Close popup
 $closePopUp.click(function(e) {
   e.preventDefault();
   $popUp.addClass("loader hidden");
