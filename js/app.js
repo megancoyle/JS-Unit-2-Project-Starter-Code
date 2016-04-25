@@ -1,6 +1,4 @@
-/*
-  Feedr js
-*/
+/* Feedr js */
 
 var $article = $("article");
 var $dropdownButton = $(".dropdown-button");
@@ -18,6 +16,9 @@ var $navItems = $("nav ul ul li");
 //Handlebars Template variables
 var source = $("#article-template").html();
 var template = Handlebars.compile(source);
+var $popUpTitle = $("#popUp h1");
+var $popUpContent = $("#popUp p");
+var $popUpLink = $(".popUpAction");
 
 $dropdownButton.hover(function () {
   $dropdownMenu.addClass("open");
@@ -62,38 +63,43 @@ $redditValue.click(function() {
 // data.children.data.score
 
 function searchReddit() {
+  $popUp.removeClass("hidden");
   $mainContent.empty();
   var url = 'https://www.reddit.com/top.json';
-  $.get(url, function(response){
-      var articleData = response.data.children
-      for (i = 0; i < articleData.length; i++) {
-        var article = new Article({
-          title: articleData[i].data.title,
-          impressions: articleData[i].data.score,
-          tag: articleData[i].data.subreddit,
-          image: articleData[i].data.thumbnail,
-          link: articleData[i].data.url,
-          description: " "
-        });
-        $mainContent.append(template(article));
-        var $popUpTitle = $("#popUp h1");
-        var $popUpContent = $("#popUp p");
-        var $popUpLink = $(".popUpAction");
-      }
-      // On click of article title, display pop-up
-      var $title = $(".article .articleContent h3");
-      $title.click(function (e) {
-        e.preventDefault();
-        var $clickedTitle = $(e.target);
-        var $selectedArticle = $clickedTitle.closest('.article');
-        var titleText = $selectedArticle.find('.title').text();
-        var contentText = $selectedArticle.find('.content').text();
-        var storyLink = $selectedArticle.find('.story-link').attr("href");
-        $popUpTitle.html(titleText);
-        $popUpContent.html(contentText);
-        $popUpLink.attr("href", storyLink);
-        $popUp.removeClass("loader hidden");
-      })
+  $.ajax({
+    url: url,
+    success: function(response){
+        $popUp.addClass("hidden");
+        var articleData = response.data.children
+        for (i = 0; i < articleData.length; i++) {
+          var article = new Article({
+            title: articleData[i].data.title,
+            impressions: articleData[i].data.score,
+            tag: articleData[i].data.subreddit,
+            image: articleData[i].data.thumbnail,
+            link: articleData[i].data.url,
+            description: " "
+          });
+          $mainContent.append(template(article));
+        }
+        // On click of article title, display pop-up
+        var $title = $(".article .articleContent h3");
+        $title.click(function (e) {
+          e.preventDefault();
+          var $clickedTitle = $(e.target);
+          var $selectedArticle = $clickedTitle.closest('.article');
+          var titleText = $selectedArticle.find('.title').text();
+          var contentText = $selectedArticle.find('.content').text();
+          var storyLink = $selectedArticle.find('.story-link').attr("href");
+          $popUpTitle.html(titleText);
+          $popUpContent.html(contentText);
+          $popUpLink.attr("href", storyLink);
+          $popUp.removeClass("loader hidden");
+        })
+    },
+    error: function () {
+      alert("Can't load because of error.");
+    }
   })
 }
 
@@ -112,9 +118,13 @@ $mashableValue.click(function() {
 // new.shares.total
 
 function searchMashable() {
+  $popUp.removeClass("hidden");
   $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/mashable.json';
-  $.get(url, function(response){
+  $.ajax({
+    url: url,
+    success: function(response){
+      $popUp.addClass("hidden");
       var articleData = response.new;
       for (i = 0; i < articleData.length; i++) {
         var article = new Article({
@@ -125,11 +135,7 @@ function searchMashable() {
           link: articleData[i].link,
           description: articleData[i].content.plain
         });
-        console.log(article);
         $mainContent.append(template(article));
-        var $popUpTitle = $("#popUp h1");
-        var $popUpContent = $("#popUp p");
-        var $popUpLink = $(".popUpAction");
       }
       // On click of article title, display pop-up
       var $title = $(".article .articleContent h3");
@@ -145,6 +151,10 @@ function searchMashable() {
         $popUpLink.attr("href", storyLink);
         $popUp.removeClass("loader hidden");
       })
+    },
+    error: function () {
+      alert("Can't load because of error.");
+    }
   })
 }
 
@@ -162,9 +172,13 @@ $diggValue.click(function() {
 // data.feed.diggs.count
 
 function searchDigg() {
+  $popUp.removeClass("hidden");
   $mainContent.empty();
   var url = 'http://feedr-api.wdidc.org/digg.json';
-  $.get(url, function(response){
+  $.ajax({
+    url: url,
+    success: function(response){
+      $popUp.addClass("hidden");
       var articleData = response.data.feed;
     // console.log(response);
       for (i = 0; i < articleData.length; i++) {
@@ -177,9 +191,6 @@ function searchDigg() {
           description: articleData[i].content.description
         });
         $mainContent.append(template(article));
-        var $popUpTitle = $("#popUp h1");
-        var $popUpContent = $("#popUp p");
-        var $popUpLink = $(".popUpAction");
       }
       // On click of article title, display pop-up
       var $title = $(".article .articleContent h3");
@@ -195,7 +206,10 @@ function searchDigg() {
         $popUpLink.attr("href", storyLink);
         $popUp.removeClass("loader hidden");
       })
-
+    },
+    error: function () {
+      alert("Can't load because of error.");
+    }
   })
 }
 
