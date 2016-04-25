@@ -2,6 +2,7 @@
 
 var $article = $("article");
 var $mainContent = $("#main");
+var $logo = $("#logo");
 
 //Nav and search variables
 var $dropdownButton = $(".dropdown-button");
@@ -27,17 +28,31 @@ var template = Handlebars.compile(source);
 
 //Main view
 $(document).ready(function(){
+  searchAll();
+})
+
+//On click of Feedr logo, show main view
+$logo.click(function(){
+  searchAll();
+})
+
+function searchAll(){
   $popUp.removeClass("hidden");
   searchReddit();
   searchDigg();
   searchMashable();
+}
+
+//Search functionality
+$search.click(function () {
+  $search.toggleClass("active");
 })
 
 $dropdownButton.hover(function () {
   $dropdownMenu.addClass("open");
 });
 
-$search.click(function(){
+$dropdownButton.click(function(){
   switch ($initialValue.text()) {
     case 'Reddit':
       searchReddit();
