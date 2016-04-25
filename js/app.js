@@ -1,24 +1,37 @@
 /* Feedr js */
 
 var $article = $("article");
+var $mainContent = $("#main");
+
+//Nav and search variables
 var $dropdownButton = $(".dropdown-button");
 var $dropdownMenu = $(".dropdown-menu");
-var $popUp = $("#popUp");
-var $closePopUp = $(".closePopUp");
-var $search = $("#search");
 var $nav = $("nav");
+var $navItems = $("nav ul ul li");
+var $search = $("#search");
 var $mashableValue = $("#mashable");
 var $redditValue = $("#reddit");
 var $diggValue = $("#digg");
 var $initialValue = $("#initial-value span");
-var $mainContent = $("#main");
-var $navItems = $("nav ul ul li");
-//Handlebars Template variables
-var source = $("#article-template").html();
-var template = Handlebars.compile(source);
+
+//PopUp variables
+var $popUp = $("#popUp");
+var $closePopUp = $(".closePopUp");
 var $popUpTitle = $("#popUp h1");
 var $popUpContent = $("#popUp p");
 var $popUpLink = $(".popUpAction");
+
+//Handlebars Template variables
+var source = $("#article-template").html();
+var template = Handlebars.compile(source);
+
+//Main view
+$(document).ready(function(){
+  $popUp.removeClass("hidden");
+  searchReddit();
+  searchDigg();
+  searchMashable();
+})
 
 $dropdownButton.hover(function () {
   $dropdownMenu.addClass("open");
@@ -52,16 +65,8 @@ $redditValue.click(function() {
   $initialValue.text("Reddit");
 })
 
-// console.log(myArticle);
 
-// REDDIT API
-// data.children.data.title
-// data.children.data.url //URL to content, add to title link
-// data.children.data.thumnail //URL for image
-// data.children.data.url //URL to content, add read more link
-// data.children.data.subreddit //category
-// data.children.data.score
-
+// REDDIT Search
 function searchReddit() {
   $popUp.removeClass("hidden");
   $mainContent.empty();
@@ -84,18 +89,7 @@ function searchReddit() {
         }
         // On click of article title, display pop-up
         var $title = $(".article .articleContent h3");
-        $title.click(function (e) {
-          e.preventDefault();
-          var $clickedTitle = $(e.target);
-          var $selectedArticle = $clickedTitle.closest('.article');
-          var titleText = $selectedArticle.find('.title').text();
-          var contentText = $selectedArticle.find('.content').text();
-          var storyLink = $selectedArticle.find('.story-link').attr("href");
-          $popUpTitle.html(titleText);
-          $popUpContent.html(contentText);
-          $popUpLink.attr("href", storyLink);
-          $popUp.removeClass("loader hidden");
-        })
+        $title.click(changePopUp);
     },
     error: function () {
       alert("Can't load because of error.");
@@ -109,14 +103,8 @@ $mashableValue.click(function() {
   $initialValue.text("Mashable");
 })
 
-// MASHABLE API
-// new.title
-// new.link // link to full content
-// new.feature_image //URL for image
-// new.content
-// new.channel // category
-// new.shares.total
 
+// MASHABLE Search
 function searchMashable() {
   $popUp.removeClass("hidden");
   $mainContent.empty();
@@ -139,18 +127,7 @@ function searchMashable() {
       }
       // On click of article title, display pop-up
       var $title = $(".article .articleContent h3");
-      $title.click(function (e) {
-        e.preventDefault();
-        var $clickedTitle = $(e.target);
-        var $selectedArticle = $clickedTitle.closest('.article');
-        var titleText = $selectedArticle.find('.title').text();
-        var contentText = $selectedArticle.find('.content').text();
-        var storyLink = $selectedArticle.find('.story-link').attr("href");
-        $popUpTitle.html(titleText);
-        $popUpContent.html(contentText);
-        $popUpLink.attr("href", storyLink);
-        $popUp.removeClass("loader hidden");
-      })
+      $title.click(changePopUp);
     },
     error: function () {
       alert("Can't load because of error.");
@@ -163,14 +140,8 @@ $diggValue.click(function() {
   $initialValue.text("Digg");
 })
 
-// DIGG API
-// data.feed.content.title
-// data.feed.content.url // Link to full content
-// data.feed.content.media.images[0].url //URL for image
-// data.feed.content.description
-// data.feed.content.domain_name // category
-// data.feed.diggs.count
 
+// DIGG Search
 function searchDigg() {
   $popUp.removeClass("hidden");
   $mainContent.empty();
@@ -194,23 +165,26 @@ function searchDigg() {
       }
       // On click of article title, display pop-up
       var $title = $(".article .articleContent h3");
-      $title.click(function (e) {
-        e.preventDefault();
-        var $clickedTitle = $(e.target);
-        var $selectedArticle = $clickedTitle.closest('.article');
-        var titleText = $selectedArticle.find('.title').text();
-        var contentText = $selectedArticle.find('.content').text();
-        var storyLink = $selectedArticle.find('.story-link').attr("href");
-        $popUpTitle.html(titleText);
-        $popUpContent.html(contentText);
-        $popUpLink.attr("href", storyLink);
-        $popUp.removeClass("loader hidden");
-      })
+      $title.click(changePopUp);
     },
     error: function () {
       alert("Can't load because of error.");
     }
   })
+}
+
+// Populate popup with article info
+function changePopUp (e) {
+  e.preventDefault();
+  var $clickedTitle = $(e.target);
+  var $selectedArticle = $clickedTitle.closest('.article');
+  var titleText = $selectedArticle.find('.title').text();
+  var contentText = $selectedArticle.find('.content').text();
+  var storyLink = $selectedArticle.find('.story-link').attr("href");
+  $popUpTitle.html(titleText);
+  $popUpContent.html(contentText);
+  $popUpLink.attr("href", storyLink);
+  $popUp.removeClass("loader hidden");
 }
 
 // Close popup
